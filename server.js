@@ -16,9 +16,22 @@ const MAX_MB     = 50;
 const ALLOWED    = [".ehi",".npx",".ovpn",".maya",".zip",".bdnet",".txt",".apnalite",".bin",".cfg"];
 
 // ── REDIS ─────────────────────────────────────────────────────
-const redis = new Redis(process.env.REDIS_URL, {
-  maxRetriesPerRequest: 3,
-});
+// ── REDIS ─────────────────────────────────────────────────────
+let redis;
+try {
+  redis = new Redis(process.env.REDIS_URL, {
+    maxRetriesPerRequest: 2,
+    connectTimeout: 5000,
+    commandTimeout: 5000,
+    lazyConnect: false,
+    enableOfflineQueue: false,
+  });
+  redis.on("error", (err) => {
+    console.error("Redis error:", err.message);
+  });
+} catch (e) {
+  console.error("Redis init error:", e.message);
+}
 // Apps VPN (fixas — edita aqui para alterar)
 const APPS = [
   { id:1, slug:"http-injector", name:"HTTP Injector",   icon:"💉", color:"#00e5ff", description:"Configurações para HTTP Injector. Importa o ficheiro .ehi directamente na app.", sort_order:1 },
