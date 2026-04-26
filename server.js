@@ -2,9 +2,9 @@ const express  = require("express");
 const session  = require("express-session");
 const multer   = require("multer");
 const path     = require("path");
-const Redis = require("ioredis");
+const Redis    = require("ioredis");
 const { put, del } = require("@vercel/blob");
-const redis = new Redis(process.env.REDIS_URL, {
+
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,8 +13,12 @@ const SITE_NAME  = "VPN Free AO";
 const ADMIN_USER = process.env.ADMIN_USER || "admin";
 const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
 const MAX_MB     = 50;
-const ALLOWED    = [".ehi",".npv",".ovpn",".maya",".zip",".json",".txt",".bdnet",".apnalite",".cfg"];
+const ALLOWED    = [".ehi",".npx",".ovpn",".maya",".zip",".bdnet",".txt",".apnalite",".bin",".cfg"];
 
+// ── REDIS ─────────────────────────────────────────────────────
+const redis = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: 3,
+});
 // Apps VPN (fixas — edita aqui para alterar)
 const APPS = [
   { id:1, slug:"http-injector", name:"HTTP Injector",   icon:"💉", color:"#00e5ff", description:"Configurações para HTTP Injector. Importa o ficheiro .ehi directamente na app.", sort_order:1 },
