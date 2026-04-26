@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050810;--card:#0c1220;--b:rgba(255,255,255,.07);--cyan:#00e5ff;--text:#f0f4ff;--muted:#4a5568;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(0,229,255,.06),transparent 70%);pointer-events:none}
+.box{background:var(--card);border:1px solid rgba(0,229,255,.15);border-radius:20px;padding:40px;width:100%;max-width:380px;position:relative;z-index:1}
+.head{text-align:center;margin-bottom:32px}
+.head-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),#a855f7);display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto 14px}
+.head h1{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--cyan)}
+.head p{font-size:.78rem;color:var(--muted);margin-top:4px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+label{font-size:.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:10px;padding:12px 14px;color:var(--text);font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;width:100%}
+input:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+.btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--cyan),#00b4cc);color:#000;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;cursor:pointer;margin-top:8px}
+.btn:hover{filter:brightness(1.1)}
+.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 14px;color:var(--red);font-size:.82rem;margin-bottom:16px}
+.back{display:block;text-align:center;margin-top:18px;color:var(--muted);font-size:.8rem;text-decoration:none}
+.back:hover{color:var(--cyan)}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="head">
+    <div class="head-icon">⚙️</div>
+    <h1>Admin Panel</h1>
+    <p><%= siteName %></p>
+  </div>
+  <% if (error) { %><div class="err">⚠ <%= error %></div><% } %>
+  <form method="POST" action="/admin/login">
+    <div class="fg"><label>Utilizador</label><input type="text" name="username" required autocomplete="username"></div>
+    <div class="fg"><label>Palavra-passe</label><input type="password" name="password" required></div>
+    <button type="submit" class="btn">ENTRAR</button>
+  </form>
+  <a href="/" class="back">← Voltar ao site</a>
+</div>
+</body>
+</html>

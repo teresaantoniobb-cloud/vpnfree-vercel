@@ -1,0 +1,64 @@
+<%
+const page = 'files';
+const body = `
+<style>
+.card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:24px;margin-bottom:16px}
+.ct{font-size:.85rem;font-weight:600;color:var(--cyan);margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+label{font-size:.73rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:10px;padding:10px 13px;color:var(--text);font-size:.87rem;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.07)}
+select option{background:#0c1220}
+textarea{resize:vertical;min-height:72px}
+.btn-back{background:rgba(255,255,255,.05);border:1px solid var(--b);color:var(--muted)}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}}
+</style>
+<div class="topbar" style="gap:16px">
+  <a href="/admin/files" class="btn btn-back">← Voltar</a>
+  <h1>Editar Ficheiro</h1>
+</div>
+<div class="content" style="max-width:660px">
+  ${msg ? `<div class="alert ok">✅ ${msg}</div>` : ''}
+  <form method="POST" action="/admin/edit/${file.id}" enctype="multipart/form-data">
+    <div class="card">
+      <div class="ct">📋 Informações</div>
+      <div class="fgrid">
+        <div class="fg" style="grid-column:1/-1">
+          <label>App VPN</label>
+          <select name="app_id">
+            ${apps.map(a=>`<option value="${a.id}" ${a.id===file.app_id?'selected':''}>${a.icon} ${a.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Título *</label>
+          <input type="text" name="title" value="${file.title}" required>
+        </div>
+        <div class="fg">
+          <label>Palavra-passe</label>
+          <input type="text" name="password" value="${file.password||''}">
+        </div>
+        <div class="fg">
+          <label>Servidor</label>
+          <input type="text" name="server" value="${file.server||''}">
+        </div>
+        <div class="fg">
+          <label>Ordem</label>
+          <input type="number" name="sort_order" value="${file.sort_order}" min="0" max="99">
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Descrição</label>
+          <textarea name="description">${file.description||''}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📦 Substituir Ficheiro (opcional)</div>
+      <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px">Actual: <strong style="color:var(--cyan)">${file.original_name}</strong> (${formatBytes(file.file_size)})</p>
+      <input type="file" name="vpn_file" accept=".ehi,.npx,.ovpn,.conf,.zip,.json,.txt,.vnn,.bin,.cfg">
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Guardar</button>
+  </form>
+</div>`;
+%>
+<%- include('layout', { body, page }) %>

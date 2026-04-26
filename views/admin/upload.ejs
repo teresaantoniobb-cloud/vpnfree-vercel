@@ -1,0 +1,78 @@
+<%
+const page = 'upload';
+const body = `
+<style>
+.card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:24px;margin-bottom:16px}
+.ct{font-size:.85rem;font-weight:600;color:var(--cyan);margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+label{font-size:.73rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+input,select,textarea{background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:10px;padding:10px 13px;color:var(--text);font-size:.87rem;font-family:'DM Sans',sans-serif;outline:none;transition:all .2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.07)}
+select option{background:#0c1220}
+textarea{resize:vertical;min-height:72px}
+.drop{border:2px dashed rgba(0,229,255,.2);border-radius:12px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(0,229,255,.02)}
+.drop:hover{border-color:var(--cyan);background:rgba(0,229,255,.05)}
+.hint{font-size:.72rem;color:var(--muted);margin-top:4px}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}}
+</style>
+<div class="topbar"><h1>Enviar Ficheiro VPN</h1></div>
+<div class="content" style="max-width:680px">
+  ${msg ? `<div class="alert ok">✅ ${msg}</div>` : ''}
+  ${err ? `<div class="alert er">⚠ ${err}</div>` : ''}
+  <form method="POST" action="/admin/upload" enctype="multipart/form-data">
+    <div class="card">
+      <div class="ct">📋 Detalhes</div>
+      <div class="fgrid">
+        <div class="fg" style="grid-column:1/-1">
+          <label>App VPN *</label>
+          <select name="app_id" required>
+            <option value="">Seleccionar app...</option>
+            ${apps.map(a => `<option value="${a.id}" ${a.id===preApp?'selected':''}>${a.icon} ${a.name} (${counts[a.id]||0}/5)</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Título *</label>
+          <input type="text" name="title" placeholder="Ex: Configuração UNITEL #1" required>
+        </div>
+        <div class="fg">
+          <label>Palavra-passe (opcional)</label>
+          <input type="text" name="password" placeholder="Deixa vazio se não tiver">
+        </div>
+        <div class="fg">
+          <label>Servidor / Operadora</label>
+          <input type="text" name="server" placeholder="Ex: UNITEL, MOVICEL">
+        </div>
+        <div class="fg">
+          <label>Ordem de exibição</label>
+          <input type="number" name="sort_order" value="0" min="0" max="99">
+          <span class="hint">0 = primeiro</span>
+        </div>
+        <div class="fg" style="grid-column:1/-1">
+          <label>Descrição (opcional)</label>
+          <textarea name="description" placeholder="Notas sobre esta configuração..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="ct">📦 Ficheiro</div>
+      <div class="drop" id="drop" onclick="document.getElementById('fi').click()">
+        <div style="font-size:2.2rem;margin-bottom:8px">⬆️</div>
+        <strong id="fn">Clica ou arrasta o ficheiro aqui</strong>
+        <p style="font-size:.82rem;color:var(--muted);margin-top:6px">.ehi · .npx · .ovpn · .conf · .zip · .json · .txt · .vnn · .bin · .cfg — Máx 50MB</p>
+      </div>
+      <input type="file" id="fi" name="vpn_file" style="display:none" required
+        accept=".ehi,.npx,.ovpn,.conf,.zip,.json,.txt,.vnn,.bin,.cfg"
+        onchange="document.getElementById('fn').textContent='📄 '+this.files[0].name">
+    </div>
+    <button type="submit" class="btn btn-primary">⬆ Enviar Ficheiro</button>
+  </form>
+</div>
+<script>
+const d=document.getElementById('drop');
+d.addEventListener('dragover',e=>{e.preventDefault();d.style.borderColor='var(--cyan)'});
+d.addEventListener('dragleave',()=>d.style.borderColor='');
+d.addEventListener('drop',e=>{e.preventDefault();d.style.borderColor='';const fi=document.getElementById('fi');fi.files=e.dataTransfer.files;document.getElementById('fn').textContent='📄 '+fi.files[0].name});
+</script>`;
+%>
+<%- include('layout', { body, page }) %>

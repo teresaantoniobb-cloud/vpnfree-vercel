@@ -1,0 +1,84 @@
+<%
+const body = `
+<style>
+.hero{padding:100px 32px 80px;text-align:center;max-width:1140px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.15);border-radius:999px;padding:8px 20px;font-size:.78rem;font-weight:600;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:32px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,9vw,7rem);letter-spacing:2px;line-height:.95;margin-bottom:24px}
+.hero h1 .g{display:block;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:1rem;color:var(--muted);max-width:460px;margin:0 auto 56px;line-height:1.8}
+.hero-stats{display:flex;gap:0;justify-content:center;border:1px solid var(--b);border-radius:16px;overflow:hidden;max-width:500px;margin:0 auto;background:var(--card)}
+.stat{flex:1;padding:20px 16px;text-align:center;border-right:1px solid var(--b)}.stat:last-child{border-right:none}
+.stat-n{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:1px;color:var(--cyan);line-height:1}
+.stat-l{font-size:.7rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.apps-section{padding:60px 32px 80px;max-width:1140px;margin:0 auto}
+.slabel{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:4px;color:var(--muted);display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.slabel::after{content:'';flex:1;height:1px;background:var(--b)}
+.apps-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+.app-card{background:var(--card);border:1px solid var(--b);border-radius:22px;overflow:hidden;text-decoration:none;display:block;transition:all .35s cubic-bezier(.25,.8,.25,1);position:relative}
+.app-card:hover{transform:translateY(-8px) scale(1.01);border-color:color-mix(in srgb,var(--ac) 35%,transparent);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.card-glow{position:absolute;top:-30px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--ac) 0%,transparent 70%);opacity:.08;pointer-events:none}
+.card-top{padding:32px 28px 24px;position:relative;z-index:1}
+.app-icon-wrap{width:60px;height:60px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:20px}
+.app-name{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:1.5px;color:var(--text);line-height:1;margin-bottom:10px}
+.app-desc{font-size:.85rem;color:var(--muted);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-bottom{padding:18px 28px 24px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+.file-count{display:flex;align-items:center;gap:8px;font-size:.82rem;color:var(--muted)}
+.count-badge{border-radius:8px;padding:4px 10px;font-weight:700;font-size:.82rem}
+.go-btn{display:flex;align-items:center;gap:8px;border-radius:10px;padding:9px 18px;font-size:.82rem;font-weight:600;transition:all .2s;border:1px solid}
+.app-card:hover .go-btn{color:#000!important;border-color:transparent!important}
+.howto-section{padding:0 32px 80px;max-width:1140px;margin:0 auto}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.step-card{background:var(--card);border:1px solid var(--b);border-radius:16px;padding:24px 20px}
+.step-num{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;line-height:1;margin-bottom:12px;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.step-title{font-weight:600;font-size:.9rem;margin-bottom:6px}
+.step-desc{font-size:.8rem;color:var(--muted);line-height:1.6}
+@media(max-width:768px){.apps-grid{grid-template-columns:1fr}.steps-grid{grid-template-columns:repeat(2,1fr)}.hero,.apps-section,.howto-section{padding-left:16px;padding-right:16px}}
+@media(max-width:480px){.steps-grid{grid-template-columns:1fr}.hero-stats{flex-direction:column}.stat{border-right:none;border-bottom:1px solid var(--b)}.stat:last-child{border-bottom:none}}
+</style>
+
+<section class="hero z">
+  <div class="hero-eyebrow">🇦🇴 Angola · Sempre Actualizado</div>
+  <h1>CONFIGURAÇÕES<span class="g">VPN GRÁTIS</span></h1>
+  <p class="hero-sub">Ficheiros prontos para importar nas tuas apps VPN favoritas. Sem registo, sem pagamento, sempre gratuito.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-n">${apps.length}</div><div class="stat-l">Apps VPN</div></div>
+    <div class="stat"><div class="stat-n">20</div><div class="stat-l">Ficheiros</div></div>
+    <div class="stat"><div class="stat-n">0 Kz</div><div class="stat-l">Custo</div></div>
+  </div>
+</section>
+
+<section class="apps-section z">
+  <div class="slabel">Escolhe a tua aplicação</div>
+  <div class="apps-grid">
+    ${apps.map(app => {
+      const cnt = counts[app.id] || 0;
+      return `<a href="/app/${app.slug}" class="app-card" style="--ac:${app.color}">
+        <div class="card-glow"></div>
+        <div class="card-top">
+          <div class="app-icon-wrap" style="background:color-mix(in srgb,${app.color} 12%,transparent);border:1px solid color-mix(in srgb,${app.color} 20%,transparent)">${app.icon}</div>
+          <div class="app-name">${app.name}</div>
+          <div class="app-desc">${app.description || ''}</div>
+        </div>
+        <div class="card-bottom">
+          <div class="file-count">
+            <span class="count-badge" style="background:color-mix(in srgb,${app.color} 15%,transparent);color:${app.color}">${cnt}</span>
+            ficheiro${cnt !== 1 ? 's' : ''} disponíve${cnt !== 1 ? 'is' : 'l'}
+          </div>
+          <div class="go-btn" style="background:color-mix(in srgb,${app.color} 12%,transparent);border-color:color-mix(in srgb,${app.color} 25%,transparent);color:${app.color}">Ver ficheiros →</div>
+        </div>
+      </a>`;
+    }).join('')}
+  </div>
+</section>
+
+<section class="howto-section z">
+  <div class="slabel">Como usar</div>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-num">01</div><div class="step-title">Escolhe a app</div><div class="step-desc">Selecciona a aplicação VPN que tens instalada no teu telemóvel.</div></div>
+    <div class="step-card"><div class="step-num">02</div><div class="step-title">Escolhe o ficheiro</div><div class="step-desc">Vês até 5 ficheiros disponíveis. Escolhe e carrega em Download.</div></div>
+    <div class="step-card"><div class="step-num">03</div><div class="step-title">Importa na app</div><div class="step-desc">Abre a tua app VPN, vai a Importar e selecciona o ficheiro descarregado.</div></div>
+    <div class="step-card"><div class="step-num">04</div><div class="step-title">Usa a password</div><div class="step-desc">Se tiver password, carrega no botão 🔑 para ver e copiar.</div></div>
+  </div>
+</section>`;
+%>
+<%- include('layout', { body, apps, counts }) %>

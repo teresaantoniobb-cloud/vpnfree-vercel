@@ -1,0 +1,51 @@
+<%
+const page = 'files';
+const body = `
+<style>
+.filter-btns{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{padding:6px 13px;border-radius:7px;font-size:.75rem;font-weight:600;text-decoration:none;border:1px solid var(--b);background:rgba(255,255,255,.03);color:var(--muted);transition:all .2s}
+.fbtn:hover,.fbtn.on{background:rgba(0,229,255,.08);border-color:rgba(0,229,255,.2);color:var(--cyan)}
+.tcard{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse;min-width:700px}
+th{padding:9px 14px;text-align:left;font-size:.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--b);background:rgba(255,255,255,.02)}
+td{padding:11px 14px;font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.018)}
+.pwd-v{font-family:monospace;background:rgba(189,95,255,.08);border:1px solid rgba(189,95,255,.18);color:var(--purple);padding:3px 9px;border-radius:6px;font-size:.78rem}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border-radius:7px;font-size:.74rem;font-weight:600;text-decoration:none;border:1px solid transparent;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-e{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.18);color:var(--cyan)}
+.btn-d{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.18);color:var(--red)}
+.acts{display:flex;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:6px;font-size:.73rem;font-weight:600}
+</style>
+<div class="topbar" style="flex-wrap:wrap;gap:12px">
+  <h1>Ficheiros (${files.length})</h1>
+  <div class="filter-btns">
+    <a href="/admin/files" class="fbtn ${selApp===0?'on':''}">Todos</a>
+    ${apps.map(a=>`<a href="/admin/files?app=${a.id}" class="fbtn ${selApp===a.id?'on':''}">${a.icon} ${a.name}</a>`).join('')}
+  </div>
+</div>
+<div class="content" style="overflow-x:auto">
+  <div class="tcard">
+    <table>
+      <thead><tr><th>Título</th><th>App</th><th>Password</th><th>Servidor</th><th>Tam.</th><th>DL</th><th>Acções</th></tr></thead>
+      <tbody>
+      ${files.length===0 ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">Nenhum ficheiro encontrado.</td></tr>` :
+        files.map(f=>`<tr>
+          <td>${f.title}</td>
+          <td><span class="chip" style="background:color-mix(in srgb,${f.app_color} 12%,transparent);color:${f.app_color}">${f.app_icon} ${f.app_name}</span></td>
+          <td>${f.password ? `<span class="pwd-v">${f.password}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+          <td style="color:var(--muted)">${f.server||'—'}</td>
+          <td style="color:var(--muted)">${formatBytes(f.file_size)}</td>
+          <td>${f.downloads}</td>
+          <td><div class="acts">
+            <a href="/admin/edit/${f.id}" class="btn btn-e">✏ Editar</a>
+            <a href="/admin/delete/${f.id}" class="btn btn-d" onclick="return confirm('Eliminar?')">🗑</a>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>
+</div>`;
+%>
+<%- include('layout', { body, page }) %>

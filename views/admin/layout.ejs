@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title><%= typeof title !== 'undefined' ? title : 'Admin' %> — <%= siteName %></title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050810;--bg2:#090d18;--card:#0c1220;--b:rgba(255,255,255,.07);--cyan:#00e5ff;--green:#00ff88;--purple:#bd5fff;--text:#f0f4ff;--muted:#4a5568;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--b);min-height:100vh;position:sticky;top:0;display:flex;flex-direction:column;z-index:10}
+.sb-logo{padding:22px 18px;border-bottom:1px solid var(--b)}
+.sb-logo a{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--cyan);text-decoration:none}
+.sb-logo p{font-size:.7rem;color:var(--muted);margin-top:2px}
+.sb-nav{flex:1;padding:14px 10px}
+.nb{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;color:var(--muted);text-decoration:none;font-size:.82rem;font-weight:500;margin-bottom:2px;transition:all .2s;border:1px solid transparent}
+.nb:hover,.nb.on{background:rgba(0,229,255,.07);color:var(--cyan);border-color:rgba(0,229,255,.15)}
+.sb-foot{padding:14px 10px;border-top:1px solid var(--b)}
+.logout{display:block;text-align:center;color:var(--muted);font-size:.78rem;text-decoration:none;padding:8px;border-radius:6px;border:1px solid var(--b);transition:all .2s}
+.logout:hover{border-color:var(--red);color:var(--red)}
+.main{flex:1;min-width:0}
+.topbar{padding:18px 28px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.topbar h1{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:9px;font-size:.82rem;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),#00b4cc);color:#000}
+.btn-primary:hover{filter:brightness(1.1)}
+.content{padding:22px 28px}
+.alert{border-radius:10px;padding:11px 15px;font-size:.83rem;margin-bottom:16px}
+.ok{background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);color:var(--green)}
+.er{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:var(--red)}
+@media(max-width:768px){.sidebar{display:none}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="sb-logo"><a href="/admin">⚙ ADMIN</a><p><%= siteName %></p></div>
+  <nav class="sb-nav">
+    <a href="/admin"         class="nb <%= page==='dash'   ? 'on':'' %>">📊 Dashboard</a>
+    <a href="/admin/upload"  class="nb <%= page==='upload' ? 'on':'' %>">⬆ Enviar Ficheiro</a>
+    <a href="/admin/files"   class="nb <%= page==='files'  ? 'on':'' %>">📁 Ficheiros</a>
+    <a href="/"              class="nb">🌐 Ver Site</a>
+  </nav>
+  <div class="sb-foot"><a href="/admin/logout" class="logout">⏻ Sair</a></div>
+</aside>
+<div class="main">
+  <%- body %>
+</div>
+</body>
+</html>
