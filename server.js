@@ -2,9 +2,9 @@ const express  = require("express");
 const session  = require("express-session");
 const multer   = require("multer");
 const path     = require("path");
-const Redis    = require("ioredis");
+const Redis = require("ioredis");
 const { put, del } = require("@vercel/blob");
-
+const redis = new Redis(process.env.REDIS_URL, {
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
@@ -13,9 +13,9 @@ const SITE_NAME  = "VPN Free AO";
 const ADMIN_USER = process.env.ADMIN_USER || "admin";
 const ADMIN_PASS = process.env.ADMIN_PASS || "admin123";
 const MAX_MB     = 50;
-const ALLOWED    = [".ehi",".npx",".ovpn",".conf",".zip",".json",".txt",".vnn",".bin",".cfg"];
+const ALLOWED    = [".ehi",".npv",".ovpn",".maya",".zip",".json",".txt",".bdnet",".apnalite",".cfg"];
 
-// Apps VPN (fixas)
+// Apps VPN (fixas — edita aqui para alterar)
 const APPS = [
   { id:1, slug:"http-injector", name:"HTTP Injector",   icon:"💉", color:"#00e5ff", description:"Configurações para HTTP Injector. Importa o ficheiro .ehi directamente na app.", sort_order:1 },
   { id:2, slug:"bd-net",        name:"BD Net",           icon:"🌐", color:"#00ff88", description:"Configurações para BD Net. Ficheiros prontos para importar na aplicação.", sort_order:2 },
@@ -23,24 +23,21 @@ const APPS = [
   { id:4, slug:"maya-tun",      name:"Maya Tun Pro",     icon:"🌀", color:"#bd5fff", description:"Configurações para Maya Tun Pro. Alta velocidade e estabilidade.", sort_order:4 },
 ];
 
-// ── REDIS (Upstash) ───────────────────────────────────────────
-const redis = new Redis(process.env.REDIS_URL, {
-  tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined,
-  maxRetriesPerRequest: 3,
-});
+// ── HELPERS KV ────────────────────────────────────────────────
+// Estrutura no KV:
+//   vpn:files        → array de todos os ficheiros
+//   vpn:next_id      → próximo ID
 
-// ── HELPERS REDIS ─────────────────────────────────────────────
 async function getFiles() {
-  const data = await redis.get("vpn:files");
-  return data ? JSON.parse(data) : [];
+  return (await kv.get("vpn:files")) || [];
 }
 
 async function saveFiles(files) {
-  await redis.set("vpn:files", JSON.stringify(files));
+  await kv.set("vpn:files", files);
 }
 
 async function getNextId() {
-  return await redis.incr("vpn:next_id");
+  return await kv.incr("vpn:next_id");
 }
 
 async function getFilesByApp(appId) {
@@ -113,7 +110,7 @@ const formatBytes = (n) => {
   return n + " B";
 };
 
-// ── UPLOAD (memória → Vercel Blob) ────────────────────────────
+// ── UPLOAD (memória — vai para Vercel Blob) ───────────────────
 const upload = multer({
   storage: multer.memoryStorage(),
   limits:  { fileSize: MAX_MB * 1024 * 1024 },
@@ -165,6 +162,7 @@ app.get("/download/:id", async (req, res) => {
   const file = await getFileById(parseInt(req.params.id));
   if (!file || !file.blob_url) return res.status(404).send("Ficheiro não encontrado.");
   await incrementDownload(file.id);
+  // Redireciona para o URL do Vercel Blob (download directo)
   res.redirect(file.blob_url);
 });
 
@@ -224,6 +222,7 @@ app.post("/admin/upload", requireAdmin, upload.single("vpn_file"), async (req, r
     return res.redirect(`/admin/upload?app=${appId}`);
   }
 
+  // Upload para Vercel Blob
   const ext      = path.extname(req.file.originalname).toLowerCase();
   const blobName = `vpn_${Date.now()}_${Math.floor(Math.random()*9999)}${ext}`;
   const blob     = await put(blobName, req.file.buffer, {
@@ -281,12 +280,17 @@ app.post("/admin/edit/:id", requireAdmin, upload.single("vpn_file"), async (req,
     sort_order:  parseInt(req.body.sort_order) || 0,
   };
 
+  // Substituir ficheiro se enviado
   if (req.file) {
-    if (file.blob_url) { try { await del(file.blob_url); } catch {} }
+    // Apagar blob antigo
+    if (file.blob_url) {
+      try { await del(file.blob_url); } catch {}
+    }
     const ext      = path.extname(req.file.originalname).toLowerCase();
     const blobName = `vpn_${Date.now()}_${Math.floor(Math.random()*9999)}${ext}`;
     const blob     = await put(blobName, req.file.buffer, {
-      access: "public", contentType: "application/octet-stream",
+      access:      "public",
+      contentType: "application/octet-stream",
     });
     updates.original_name = req.file.originalname;
     updates.blob_name     = blobName;
@@ -302,7 +306,9 @@ app.post("/admin/edit/:id", requireAdmin, upload.single("vpn_file"), async (req,
 app.get("/admin/delete/:id", requireAdmin, async (req, res) => {
   const file = await getFileById(parseInt(req.params.id));
   if (file) {
-    if (file.blob_url) { try { await del(file.blob_url); } catch {} }
+    if (file.blob_url) {
+      try { await del(file.blob_url); } catch {}
+    }
     await deleteFile(file.id);
   }
   res.redirect("/admin/files");
